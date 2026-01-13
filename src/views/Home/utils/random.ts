@@ -3,6 +3,21 @@
  * @param array 要洗牌的数组
  * @returns 洗牌后的新数组
  */
+function cryptoRandomInt(maxExclusive: number): number {
+    if (maxExclusive <= 0) {
+        return 0
+    }
+    const maxUint32 = 0xFFFFFFFF
+    const limit = maxUint32 - (maxUint32 % maxExclusive)
+    const randomBuffer = new Uint32Array(1)
+    let value = 0
+    do {
+        crypto.getRandomValues(randomBuffer)
+        value = randomBuffer[0]
+    } while (value >= limit)
+    return value % maxExclusive
+}
+
 function shuffleBrowserCrypto<T>(array: T[]): T[] {
     const newArray = [...array]
     if (newArray.length <= 1)
@@ -10,12 +25,8 @@ function shuffleBrowserCrypto<T>(array: T[]): T[] {
 
     // 遍历数组，每轮生成一个随机索引
     for (let i = newArray.length - 1; i > 0; i--) {
-        // 步骤1：生成一个 32 位无符号加密随机数（仅需1个）
-        const randomBuffer = new Uint32Array(1) // 长度1表示只生成1个随机数
-        crypto.getRandomValues(randomBuffer)
-
-        // 步骤2：将随机数映射到 [0, i] 范围（核心：动态适配当前i的范围）
-        const randomIndex = randomBuffer[0] % (i + 1);
+        // 步骤1：生成 [0, i] 范围内的均匀随机索引（拒绝采样避免模偏差）
+        const randomIndex = cryptoRandomInt(i + 1)
 
         // 步骤3：交换元素
         [newArray[i], newArray[randomIndex]] = [newArray[randomIndex], newArray[i]]
@@ -42,9 +53,7 @@ export function getRandomElements<T>(sourceArray: T[], count: number): T[] {
 
     // 抽取 count 个元素，每轮选一个随机索引加入结果，然后从原数组移除
     for (let i = 0; i < count; i++) {
-        const randomBuffer = new Uint32Array(1)
-        crypto.getRandomValues(randomBuffer)
-        const randomIndex = randomBuffer[0] % newArray.length
+        const randomIndex = cryptoRandomInt(newArray.length)
 
         // 添加选中的元素到结果数组
         result.push(newArray[randomIndex])

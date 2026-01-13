@@ -9,7 +9,31 @@ import { useViewModel } from './useViewModel'
 import 'vue-toast-notification/dist/theme-sugar.css'
 
 const viewModel = useViewModel()
-const { setDefaultPersonList, tableData, currentStatus, enterLottery, stopLottery, containerRef, startLottery, continueLottery, quitLottery, isInitialDone, titleFont, titleFontSyncGlobal } = viewModel
+const {
+  setDefaultPersonList,
+  tableData,
+  currentStatus,
+  enterLottery,
+  stopLottery,
+  containerRef,
+  startLottery,
+  continueLottery,
+  quitLottery,
+  isInitialDone,
+  titleFont,
+  titleFontSyncGlobal,
+  currentPrize,
+  minPrizeCount,
+  minRoundCount,
+  maxRoundCount,
+  setCurrentPrizeCount,
+  increaseCurrentPrizeCount,
+  decreaseCurrentPrizeCount,
+  roundDrawCount,
+  setRoundDrawCount,
+  increaseRoundDrawCount,
+  decreaseRoundDrawCount,
+} = viewModel
 const globalConfig = useStore().globalConfig
 
 const { getTopTitle: topTitle, getTextColor: textColor, getTextSize: textSize, getBackground: homeBackground } = storeToRefs(globalConfig)
@@ -35,6 +59,17 @@ const { getTopTitle: topTitle, getTextColor: textColor, getTextSize: textSize, g
       :stop-lottery="stopLottery"
       :continue-lottery="continueLottery"
       :quit-lottery="quitLottery"
+      :current-prize="currentPrize"
+      :min-prize-count="minPrizeCount"
+      :set-prize-count="setCurrentPrizeCount"
+      :increase-prize-count="increaseCurrentPrizeCount"
+      :decrease-prize-count="decreaseCurrentPrizeCount"
+      :round-draw-count="roundDrawCount"
+      :min-round-count="minRoundCount"
+      :max-round-count="maxRoundCount"
+      :set-round-count="setRoundDrawCount"
+      :increase-round-count="increaseRoundDrawCount"
+      :decrease-round-count="decreaseRoundDrawCount"
     />
   </div>
   <StarsBackground :home-background="homeBackground" />

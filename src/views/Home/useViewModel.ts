@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia'
 import { PerspectiveCamera, Scene } from 'three'
 import { CSS3DObject, CSS3DRenderer } from 'three-css3d'
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useToast } from 'vue-toast-notification'
 import dongSound from '@/assets/audio/end.mp3'
 import enterAudio from '@/assets/audio/enter.wav'
@@ -67,11 +67,96 @@ export function useViewModel() {
     const luckyTargets = ref<any[]>([])
     const luckyCardList = ref<number[]>([])
     const luckyCount = ref(10)
+    const roundDrawCount = ref(0)
     const personPool = ref<IPersonConfig[]>([])
     const intervalTimer = ref<any>(null)
     const isInitialDone = ref<boolean>(false)
     const animationFrameId = ref<any>(null)
     const playingAudios = ref<HTMLAudioElement[]>([])
+
+    const minPrizeCount = computed(() => {
+        const usedCount = currentPrize.value?.isUsedCount ?? 0
+        return Math.max(1, usedCount)
+    })
+    const maxRoundCount = computed(() => getRemainingCount())
+    const minRoundCount = computed(() => (maxRoundCount.value > 0 ? 1 : 0))
+
+    function normalizePrizeCount(value: number) {
+        const nextValue = Number.isFinite(value) ? Math.round(value) : minPrizeCount.value
+        return Math.max(minPrizeCount.value, nextValue)
+    }
+
+    function setCurrentPrizeCount(value: number) {
+        if (!currentPrize.value) {
+            return
+        }
+        const nextCount = normalizePrizeCount(value)
+        if (currentPrize.value.count === nextCount) {
+            return
+        }
+        currentPrize.value.count = nextCount
+        if (currentPrize.value.separateCount?.countList?.length) {
+            currentPrize.value.separateCount.countList = []
+        }
+        currentPrize.value.isUsed = currentPrize.value.isUsedCount >= currentPrize.value.count
+    }
+
+    function increaseCurrentPrizeCount(step = 1) {
+        const currentCount = currentPrize.value?.count ?? minPrizeCount.value
+        setCurrentPrizeCount(currentCount + step)
+    }
+
+    function decreaseCurrentPrizeCount(step = 1) {
+        const currentCount = currentPrize.value?.count ?? minPrizeCount.value
+        setCurrentPrizeCount(currentCount - step)
+    }
+
+    function getRemainingCount() {
+        if (!currentPrize.value) {
+            return 0
+        }
+        let remaining = currentPrize.value.count - currentPrize.value.isUsedCount
+        const customCount = currentPrize.value.separateCount
+        if (customCount && customCount.enable && customCount.countList.length > 0) {
+            for (let i = 0; i < customCount.countList.length; i++) {
+                if (customCount.countList[i].isUsedCount < customCount.countList[i].count) {
+                    remaining = customCount.countList[i].count - customCount.countList[i].isUsedCount
+                    break
+                }
+            }
+        }
+        return Math.max(0, remaining)
+    }
+
+    function normalizeRoundCount(value: number) {
+        if (maxRoundCount.value <= 0) {
+            return 0
+        }
+        const nextValue = Number.isFinite(value) ? Math.round(value) : minRoundCount.value
+        return Math.min(maxRoundCount.value, Math.max(minRoundCount.value, nextValue))
+    }
+
+    function setRoundDrawCount(value: number) {
+        roundDrawCount.value = normalizeRoundCount(value)
+    }
+
+    function increaseRoundDrawCount(step = 1) {
+        setRoundDrawCount(roundDrawCount.value + step)
+    }
+
+    function decreaseRoundDrawCount(step = 1) {
+        setRoundDrawCount(roundDrawCount.value - step)
+    }
+
+    watch([() => currentPrize.value?.id, maxRoundCount], () => {
+        if (maxRoundCount.value <= 0) {
+            roundDrawCount.value = 0
+            return
+        }
+        if (!roundDrawCount.value || roundDrawCount.value > maxRoundCount.value) {
+            roundDrawCount.value = maxRoundCount.value
+        }
+    }, { immediate: true })
 
     // 抽奖音乐相关
     const lotteryMusic = ref<HTMLAudioElement | null>(null)
@@ -485,20 +570,12 @@ export function useViewModel() {
 
             return
         }
-        luckyCount.value = 10
-        // 自定义抽奖个数
-
-        let leftover = currentPrize.value.count - currentPrize.value.isUsedCount
-        const customCount = currentPrize.value.separateCount
-        if (customCount && customCount.enable && customCount.countList.length > 0) {
-            for (let i = 0; i < customCount.countList.length; i++) {
-                if (customCount.countList[i].isUsedCount < customCount.countList[i].count) {
-                    leftover = customCount.countList[i].count - customCount.countList[i].isUsedCount
-                    break
-                }
-            }
+        const leftover = getRemainingCount()
+        if (roundDrawCount.value <= 0) {
+            setRoundDrawCount(leftover)
         }
-        luckyCount.value = leftover < luckyCount.value ? leftover : luckyCount.value
+        const roundCount = normalizeRoundCount(roundDrawCount.value || leftover)
+        luckyCount.value = roundCount
         // 重构抽奖函数
         luckyTargets.value = getRandomElements(personPool.value, luckyCount.value)
         luckyTargets.value.forEach((item) => {
@@ -651,6 +728,7 @@ export function useViewModel() {
             currentPrize.value.isUsed = true
             currentPrize.value.isUsedCount = currentPrize.value.count
         }
+        roundDrawCount.value = getRemainingCount()
         personConfig.addAlreadyPersonList(luckyTargets.value, currentPrize.value)
         prizeConfig.updatePrizeConfig(currentPrize.value)
         await enterLottery()
@@ -853,5 +931,16 @@ export function useViewModel() {
         isInitialDone,
         titleFont,
         titleFontSyncGlobal,
+        currentPrize,
+        minPrizeCount,
+        minRoundCount,
+        maxRoundCount,
+        setCurrentPrizeCount,
+        increaseCurrentPrizeCount,
+        decreaseCurrentPrizeCount,
+        roundDrawCount,
+        setRoundDrawCount,
+        increaseRoundDrawCount,
+        decreaseRoundDrawCount,
     }
 }

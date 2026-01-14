@@ -1,6 +1,7 @@
 export const dialogEn = {
     titleTip: 'Tip!',
     titleTemporary: 'Add Temporary Activity',
+    titleWinners: 'Winners',
     dialogPCWeb: 'Please use a PC browser to access for optimal display performance',
     dialogDelAllPerson: 'This operation will delete all personnel list data. Do you want to continue?',
     dialogResetWinner: 'This operation will clear the winning information of personnel. Do you want to continue?',
@@ -16,6 +17,7 @@ export const dialogEn = {
 export const dialogZhCn = {
     titleTip: '提示!',
     titleTemporary: '增加临时抽奖',
+    titleWinners: '中奖名单',
     dialogPCWeb: '请使用PC进行访问以获得最佳显示效果',
     dialogDelAllPerson: '该操作会删除所有人员数据，是否继续？',
     dialogResetWinner: '该操作会清空人员中奖信息，是否继续？',

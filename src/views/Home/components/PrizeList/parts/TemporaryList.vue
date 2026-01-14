@@ -9,6 +9,8 @@ defineProps<{
     isCurrent: boolean
     editTemporaryPrize: (item: IPrizeConfig) => void
     deleteTemporaryPrize: (item: IPrizeConfig) => void
+    setCurrentPrize: (item: IPrizeConfig) => void
+    viewWinners: (item: IPrizeConfig) => void
 }>()
 
 const { t } = useI18n()
@@ -16,7 +18,10 @@ const { t } = useI18n()
 
 <template>
   <div class="h-20 w-64" :class="isCurrent ? 'current-prize' : ''">
-    <div class="relative flex flex-row items-center justify-between w-full h-full shadow-xl card bg-base-100">
+    <div
+      class="relative flex flex-row items-center justify-between w-full h-full shadow-xl card bg-base-100 cursor-pointer hover:bg-base-200 transition-colors"
+      @click="setCurrentPrize(temporaryPrize)"
+    >
       <div
         v-if="temporaryPrize.isUsed"
         class="absolute z-50 w-full h-full bg-gray-800/70 item-mask rounded-xl"
@@ -39,14 +44,19 @@ const { t } = useI18n()
           :max="temporaryPrize.count"
         />
       </div>
-      <div class="flex flex-col gap-1 mr-2">
+      <div class="flex flex-col gap-1 mr-2 z-60">
+        <div class="tooltip tooltip-left" :data-tip="t('tooltip.viewWinners')">
+          <div class="cursor-pointer hover:text-fuchsia-400" @click.stop="viewWinners(temporaryPrize)">
+            <svg-icon name="eye" />
+          </div>
+        </div>
         <div class="tooltip tooltip-left" :data-tip="t('tooltip.edit')">
-          <div class="cursor-pointer hover:text-blue-400" @click="editTemporaryPrize(temporaryPrize)">
+          <div class="cursor-pointer hover:text-blue-400" @click.stop="editTemporaryPrize(temporaryPrize)">
             <svg-icon name="edit" />
           </div>
         </div>
         <div class="tooltip tooltip-left" :data-tip="t('tooltip.delete')">
-          <div class="cursor-pointer hover:text-blue-400" @click="deleteTemporaryPrize(temporaryPrize)">
+          <div class="cursor-pointer hover:text-blue-400" @click.stop="deleteTemporaryPrize(temporaryPrize)">
             <svg-icon name="delete" />
           </div>
         </div>

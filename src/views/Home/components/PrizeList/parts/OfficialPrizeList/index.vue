@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import type { IPrizeConfig } from '@/types/storeType'
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import defaultPrizeImage from '@/assets/images/龙.png'
 import TemporaryList from '../TemporaryList.vue'
 import { useGsap } from './useGsap'
@@ -12,9 +13,12 @@ const props = defineProps<{
     addTemporaryPrize: () => void
     editTemporaryPrize: (item: IPrizeConfig) => void
     deleteTemporaryPrize: (item: IPrizeConfig) => void
+    setCurrentPrize: (item: IPrizeConfig) => void
+    viewWinners: (item: IPrizeConfig) => void
     temporaryPrizeList: IPrizeConfig[]
 }>()
 
+const { t } = useI18n()
 const prizeShow = defineModel<boolean>('prizeShow')
 const scrollContainerRef = ref<any>(null)
 const ulContainerRef = ref<any>(null)
@@ -78,6 +82,8 @@ watch([prizeShow, () => props.localPrizeList.length, () => props.temporaryPrizeL
               :is-current="currentPrize.id === item.id"
               :edit-temporary-prize="editTemporaryPrize"
               :delete-temporary-prize="deleteTemporaryPrize"
+              :set-current-prize="setCurrentPrize"
+              :view-winners="viewWinners"
             />
           </li>
           <li
@@ -87,7 +93,8 @@ watch([prizeShow, () => props.localPrizeList.length, () => props.temporaryPrizeL
           >
             <div
               v-if="item.isShow"
-              class="relative flex flex-row items-center justify-between w-64 h-20 px-3 gap-6 shadow-xl card bg-base-100"
+              class="relative flex flex-row items-center justify-between w-64 h-20 px-3 gap-6 shadow-xl card bg-base-100 cursor-pointer hover:bg-base-200 transition-colors"
+              @click="setCurrentPrize(item)"
             >
               <div
                 v-if="item.isUsed"
@@ -116,6 +123,13 @@ watch([prizeShow, () => props.localPrizeList.length, () => props.temporaryPrizeL
                   class="w-full h-6 progress bg-[#52545b] progress-primary" :value="item.isUsedCount"
                   :max="item.count"
                 />
+              </div>
+              <div class="flex flex-col gap-1 mr-1 z-60">
+                <div class="tooltip tooltip-left" :data-tip="t('tooltip.viewWinners')">
+                  <div class="cursor-pointer hover:text-fuchsia-400" @click.stop="viewWinners(item)">
+                    <svg-icon name="eye" />
+                  </div>
+                </div>
               </div>
             </div>
           </li>

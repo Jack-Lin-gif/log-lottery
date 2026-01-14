@@ -1,11 +1,17 @@
 <script setup lang='ts'>
 import { ref } from 'vue'
+import type { IPrizeConfig } from '@/types/storeType'
 import OfficialPrizeList from './parts/OfficialPrizeList/index.vue'
 import OperationButton from './parts/OperationButton.vue'
 import TemporaryDialog from './parts/TemporaryDialog.vue'
+import PrizeWinnersDialog from './parts/PrizeWinnersDialog.vue'
 import { usePrizeList } from './usePrizeList'
+import useStore from '@/store'
 
 const temporaryPrizeRef = ref()
+const prizeWinnersRef = ref()
+const selectedPrizeForView = ref<IPrizeConfig | null>(null)
+
 const {
     temporaryPrize,
     temporaryPrizeList,
@@ -23,6 +29,19 @@ const {
     isMobile,
     selectedPrize,
 } = usePrizeList(temporaryPrizeRef)
+
+const prizeConfig = useStore().prizeConfig
+
+// 设置当前奖项
+function setCurrentPrize(item: IPrizeConfig) {
+    prizeConfig.setCurrentPrize(item)
+}
+
+// 查看中奖人员
+function viewWinners(item: IPrizeConfig) {
+    selectedPrizeForView.value = item
+    prizeWinnersRef.value?.showDialog()
+}
 </script>
 
 <template>
@@ -38,6 +57,10 @@ const {
       :submit-temporary-prize="submitTemporaryPrize"
       :submit-data="submitData"
     />
+    <PrizeWinnersDialog
+      ref="prizeWinnersRef"
+      :prize="selectedPrizeForView"
+    />
     <div class="h-full">
       <OfficialPrizeList
         v-model:prize-show="prizeShow"
@@ -47,6 +70,8 @@ const {
         :add-temporary-prize="addTemporaryPrize"
         :edit-temporary-prize="editTemporaryPrize"
         :delete-temporary-prize="deleteTemporaryPrize"
+        :set-current-prize="setCurrentPrize"
+        :view-winners="viewWinners"
         :temporary-prize-list="temporaryPrizeList"
       />
     </div>

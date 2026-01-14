@@ -50,6 +50,15 @@ export const usePersonConfig = defineStore('person', () => {
     const getNotPersonList = computed(() => personConfig.value.allPersonList.filter((item: IPersonConfig) => {
         return item.isWin === false
     }))
+    // 获取特定奖项的中奖人员
+    function getWinnersByPrizeId(prizeId: number | string) {
+        const prizeIdStr = String(prizeId)
+        return computed(() => {
+            return personConfig.value.allPersonList.filter(
+                (item: IPersonConfig) => item.prizeId.includes(prizeIdStr)
+            )
+        })
+    }
     // NOTE: action
     // 添加全部未中奖人员
     function addNotPersonList(personList: IPersonConfig[]) {
@@ -189,6 +198,7 @@ export const usePersonConfig = defineStore('person', () => {
         getAlreadyPersonList,
         getAlreadyPersonDetail,
         getNotPersonList,
+        getWinnersByPrizeId,
         addNotPersonList,
         addOnePerson,
         addAlreadyPersonList,

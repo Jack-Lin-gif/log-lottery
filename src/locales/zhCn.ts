@@ -1,4 +1,4 @@
-import { button, data, dialog, error, footer, placeHolder, sidebar, table, tooltip, viewTitle } from './modules'
+import { button, data, dialog, error, footer, message, placeHolder, sidebar, table, tooltip, viewTitle } from './modules'
 
 export default {
     button: button.zhCn,
@@ -11,4 +11,5 @@ export default {
     placeHolder: placeHolder.zhCn,
     data: data.zhCn,
     footer: footer.zhCn,
+    message: message.zhCn,
 }

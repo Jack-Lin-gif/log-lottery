@@ -6,15 +6,16 @@ import defaultPrizeImage from '@/assets/images/龙.png'
 
 defineProps<{
     temporaryPrize: IPrizeConfig
-    addTemporaryPrize: () => void
-    deleteTemporaryPrize: () => void
+    isCurrent: boolean
+    editTemporaryPrize: (item: IPrizeConfig) => void
+    deleteTemporaryPrize: (item: IPrizeConfig) => void
 }>()
 
 const { t } = useI18n()
 </script>
 
 <template>
-  <div class="h-20 w-72" :class="temporaryPrize.isShow ? 'current-prize' : ''">
+  <div class="h-20 w-64" :class="isCurrent ? 'current-prize' : ''">
     <div class="relative flex flex-row items-center justify-between w-full h-full shadow-xl card bg-base-100">
       <div
         v-if="temporaryPrize.isUsed"
@@ -40,12 +41,12 @@ const { t } = useI18n()
       </div>
       <div class="flex flex-col gap-1 mr-2">
         <div class="tooltip tooltip-left" :data-tip="t('tooltip.edit')">
-          <div class="cursor-pointer hover:text-blue-400" @click="addTemporaryPrize">
+          <div class="cursor-pointer hover:text-blue-400" @click="editTemporaryPrize(temporaryPrize)">
             <svg-icon name="edit" />
           </div>
         </div>
         <div class="tooltip tooltip-left" :data-tip="t('tooltip.delete')">
-          <div class="cursor-pointer hover:text-blue-400" @click="deleteTemporaryPrize">
+          <div class="cursor-pointer hover:text-blue-400" @click="deleteTemporaryPrize(temporaryPrize)">
             <svg-icon name="delete" />
           </div>
         </div>

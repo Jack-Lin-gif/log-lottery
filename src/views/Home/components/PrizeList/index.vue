@@ -3,16 +3,17 @@ import { ref } from 'vue'
 import OfficialPrizeList from './parts/OfficialPrizeList/index.vue'
 import OperationButton from './parts/OperationButton.vue'
 import TemporaryDialog from './parts/TemporaryDialog.vue'
-import TemporaryList from './parts/TemporaryList.vue'
 import { usePrizeList } from './usePrizeList'
 
 const temporaryPrizeRef = ref()
 const {
     temporaryPrize,
+    temporaryPrizeList,
     changePersonCount,
     selectPrize,
     localImageList,
     addTemporaryPrize,
+    editTemporaryPrize,
     submitTemporaryPrize,
     submitData,
     deleteTemporaryPrize,
@@ -38,23 +39,18 @@ const {
       :submit-data="submitData"
     />
     <div class="h-full">
-      <TemporaryList
-        v-if="temporaryPrize.isShow"
-        :temporary-prize="temporaryPrize"
-        :add-temporary-prize="addTemporaryPrize"
-        :delete-temporary-prize="deleteTemporaryPrize"
-      />
       <OfficialPrizeList
-        v-show="!temporaryPrize.isShow"
         v-model:prize-show="prizeShow"
-        :temporary-prize-show="temporaryPrize.isShow"
         :local-prize-list="localPrizeList"
         :current-prize="currentPrize"
         :is-mobile="isMobile"
         :add-temporary-prize="addTemporaryPrize"
+        :edit-temporary-prize="editTemporaryPrize"
+        :delete-temporary-prize="deleteTemporaryPrize"
+        :temporary-prize-list="temporaryPrizeList"
       />
     </div>
-    <OperationButton v-if="!temporaryPrize.isShow" v-model:prize-show="prizeShow" :add-temporary-prize="addTemporaryPrize" />
+    <OperationButton v-model:prize-show="prizeShow" :add-temporary-prize="addTemporaryPrize" />
   </div>
 </template>
 

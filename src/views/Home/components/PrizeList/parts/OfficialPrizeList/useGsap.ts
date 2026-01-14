@@ -1,29 +1,15 @@
 import type { Ref } from 'vue'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { onBeforeUnmount, onUnmounted, ref, watch } from 'vue'
 
-export function useGsap(scrollContainerRef: any, liRefs: any, isScroll: Ref<boolean>, prizeShow: any, temporaryPrizeShow: boolean) {
-    gsap.registerPlugin(ScrollTrigger)
-
+export function useGsap(scrollContainerRef: any, liRefs: any, isScroll: Ref<boolean>, prizeShow: any) {
     const ctx = ref()
     const showUpButton = ref(false)
     const showDownButton = ref(true)
     function initGsapAnimation() {
         ctx.value = gsap.context(() => {
             liRefs.value.forEach((box: any) => {
-                gsap.fromTo(box, { rotationX: -90, rotateZ: -20, opacity: 0 }, {
-                    rotationX: 0,
-                    rotateZ: 0,
-                    opacity: 1,
-                    scrollTrigger: {
-                        trigger: box,
-                        scroller: scrollContainerRef.value, // <- Specify the scroller!
-                        start: 'bottom 100%',
-                        end: 'top 70%',
-                        scrub: true,
-                    },
-                })
+                gsap.set(box, { rotationX: 0, rotateZ: 0, opacity: 1 })
             })
         }, scrollContainerRef.value) // <- Scope!
     }
@@ -66,8 +52,8 @@ export function useGsap(scrollContainerRef: any, liRefs: any, isScroll: Ref<bool
     function handleScroll(h: number) {
         scrollContainerRef.value.scrollTop += h
     }
-    watch([isScroll, prizeShow, temporaryPrizeShow], ([val1, val2, val3]) => {
-        if (val1 && val2 && !val3) {
+    watch([isScroll, prizeShow], ([val1, val2]) => {
+        if (val1 && val2) {
             setTimeout(() => {
                 initGsapAnimation()
                 listenScrollContainer()

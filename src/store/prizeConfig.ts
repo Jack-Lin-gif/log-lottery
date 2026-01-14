@@ -8,6 +8,7 @@ export const usePrizeConfig = defineStore('prize', {
             prizeConfig: {
                 prizeList: defaultPrizeList,
                 currentPrize: defaultCurrentPrize,
+                temporaryPrizeList: [] as IPrizeConfig[],
                 temporaryPrize: {
                     id: '',
                     name: '',
@@ -55,6 +56,10 @@ export const usePrizeConfig = defineStore('prize', {
         getTemporaryPrize(state) {
             return state.prizeConfig.temporaryPrize
         },
+        // 获取临时奖项列表
+        getTemporaryPrizeList(state) {
+            return state.prizeConfig.temporaryPrizeList || []
+        },
 
     },
     actions: {
@@ -84,7 +89,6 @@ export const usePrizeConfig = defineStore('prize', {
             else {
                 return
             }
-            this.resetTemporaryPrize()
         },
         // 删除全部奖项
         deleteAllPrizeConfig() {
@@ -110,6 +114,30 @@ export const usePrizeConfig = defineStore('prize', {
             }
 
             this.prizeConfig.temporaryPrize = prizeItem
+        },
+        addTemporaryPrizeItem(prizeItem: IPrizeConfig) {
+            if (!this.prizeConfig.temporaryPrizeList) {
+                this.prizeConfig.temporaryPrizeList = [] as IPrizeConfig[]
+            }
+            this.prizeConfig.temporaryPrizeList.push(prizeItem)
+        },
+        updateTemporaryPrizeItem(prizeItem: IPrizeConfig) {
+            if (!this.prizeConfig.temporaryPrizeList) {
+                this.prizeConfig.temporaryPrizeList = [] as IPrizeConfig[]
+            }
+            const index = this.prizeConfig.temporaryPrizeList.findIndex(item => item.id === prizeItem.id)
+            if (index > -1) {
+                this.prizeConfig.temporaryPrizeList.splice(index, 1, prizeItem)
+            }
+        },
+        deleteTemporaryPrizeItem(prizeItemId: number | string) {
+            if (!this.prizeConfig.temporaryPrizeList) {
+                this.prizeConfig.temporaryPrizeList = [] as IPrizeConfig[]
+            }
+            this.prizeConfig.temporaryPrizeList = this.prizeConfig.temporaryPrizeList.filter(item => item.id !== prizeItemId)
+        },
+        resetTemporaryPrizeList() {
+            this.prizeConfig.temporaryPrizeList = [] as IPrizeConfig[]
         },
         // 重置临时奖项
         resetTemporaryPrize() {
@@ -140,6 +168,7 @@ export const usePrizeConfig = defineStore('prize', {
             this.prizeConfig = {
                 prizeList: defaultPrizeList,
                 currentPrize: defaultCurrentPrize,
+                temporaryPrizeList: [] as IPrizeConfig[],
                 temporaryPrize: {
                     id: '',
                     name: '',

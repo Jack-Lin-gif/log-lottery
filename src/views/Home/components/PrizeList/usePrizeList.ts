@@ -1,6 +1,6 @@
 import type { IPrizeConfig } from '@/types/storeType'
 import { storeToRefs } from 'pinia'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, toRaw } from 'vue'
 import i18n from '@/locales/i18n'
 
 import useStore from '@/store'
@@ -13,6 +13,7 @@ export function usePrizeList(temporaryPrizeRef: any) {
         getPrizeConfig: localPrizeList,
         getCurrentPrize: currentPrize,
         getTemporaryPrize: temporaryPrize,
+        getTemporaryPrizeList: temporaryPrizeList,
     } = storeToRefs(prizeConfig)
     const {
         getIsShowPrizeList: isShowPrizeList,
@@ -23,24 +24,50 @@ export function usePrizeList(temporaryPrizeRef: any) {
 
     const selectedPrize = ref<IPrizeConfig | null>(null)
     const prizeShow = ref(structuredClone(isShowPrizeList.value))
+    const editingTemporaryPrizeId = ref<number | string | null>(null)
 
-    function addTemporaryPrize() {
+    function openTemporaryPrizeDialog(item?: IPrizeConfig) {
+        if (item) {
+            editingTemporaryPrizeId.value = item.id
+            temporaryPrize.value = structuredClone(toRaw(item))
+        }
+        else {
+            editingTemporaryPrizeId.value = null
+            prizeConfig.resetTemporaryPrize()
+        }
         temporaryPrizeRef.value.showDialog()
     }
+    function addTemporaryPrize() {
+        openTemporaryPrizeDialog()
+    }
+    function editTemporaryPrize(item: IPrizeConfig) {
+        openTemporaryPrizeDialog(item)
+    }
 
-    function deleteTemporaryPrize() {
-        temporaryPrize.value.isShow = false
-        prizeConfig.setTemporaryPrize(temporaryPrize.value)
+    function deleteTemporaryPrize(item: IPrizeConfig) {
+        prizeConfig.deleteTemporaryPrizeItem(item.id)
+        if (currentPrize.value?.id === item.id) {
+            setCurrentPrize()
+        }
     }
     function submitTemporaryPrize() {
         if (!temporaryPrize.value.name || !temporaryPrize.value.count) {
             // eslint-disable-next-line no-alert
             alert(i18n.global.t('error.completeInformation'))
-            return
+            return false
         }
-        temporaryPrize.value.isShow = true
-        temporaryPrize.value.id = new Date().getTime().toString()
-        prizeConfig.setCurrentPrize(temporaryPrize.value)
+        const payload = structuredClone(toRaw(temporaryPrize.value))
+        payload.isShow = true
+        if (editingTemporaryPrizeId.value) {
+            payload.id = editingTemporaryPrizeId.value
+            prizeConfig.updateTemporaryPrizeItem(payload)
+        }
+        else {
+            payload.id = new Date().getTime().toString()
+            prizeConfig.addTemporaryPrizeItem(payload)
+        }
+        prizeConfig.setCurrentPrize(payload)
+        return true
     }
     function selectPrize(item: IPrizeConfig) {
         selectedPrize.value = item
@@ -83,11 +110,13 @@ export function usePrizeList(temporaryPrizeRef: any) {
 
     return {
         temporaryPrize,
+        temporaryPrizeList,
         changePersonCount,
         selectPrize,
         currentPrize,
         localImageList,
         addTemporaryPrize,
+        editTemporaryPrize,
         submitTemporaryPrize,
         submitData,
         deleteTemporaryPrize,

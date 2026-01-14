@@ -2,14 +2,17 @@
 import type { IPrizeConfig } from '@/types/storeType'
 import { ref, watch } from 'vue'
 import defaultPrizeImage from '@/assets/images/龙.png'
+import TemporaryList from '../TemporaryList.vue'
 import { useGsap } from './useGsap'
 
 const props = defineProps<{
     isMobile: boolean
     localPrizeList: IPrizeConfig[]
     currentPrize: IPrizeConfig
-    temporaryPrizeShow: boolean
     addTemporaryPrize: () => void
+    editTemporaryPrize: (item: IPrizeConfig) => void
+    deleteTemporaryPrize: (item: IPrizeConfig) => void
+    temporaryPrizeList: IPrizeConfig[]
 }>()
 
 const prizeShow = defineModel<boolean>('prizeShow')
@@ -22,7 +25,7 @@ const {
     showUpButton,
     showDownButton,
     handleScroll,
-} = useGsap(scrollContainerRef, liRefs, isScroll, prizeShow, props.temporaryPrizeShow)
+} = useGsap(scrollContainerRef, liRefs, isScroll, prizeShow)
 
 // 获取ulContainerRef的高度
 function getUlContainerHeight() {
@@ -51,7 +54,7 @@ function getIsScroll() {
     }
 }
 
-watch ([prizeShow, () => props.temporaryPrizeShow], (val) => {
+watch([prizeShow, () => props.localPrizeList.length, () => props.temporaryPrizeList.length], (val) => {
     if (!val[0]) {
         return
     }
@@ -63,12 +66,20 @@ watch ([prizeShow, () => props.temporaryPrizeShow], (val) => {
 
 <template>
   <transition name="prize-list" class="h-full" :appear="true">
-    <div v-show="prizeShow && !isMobile && !temporaryPrizeShow" class="flex items-center h-full relative ">
+    <div v-show="prizeShow && !isMobile" class="flex items-center h-full relative ">
       <div v-if="isScroll" class="w-full h-16 flex justify-center scroll-button scroll-button-up absolute top-0 z-50">
         <SvgIcon v-show="showUpButton" name="chevron-up" size="64px" class="text-gray-200/80 cursor-pointer" @click="handleScroll(-150)" />
       </div>
       <div ref="scrollContainerRef" :class="isScroll ? (showDownButton ? 'scroll-container' : 'scroll-container-end') : 'no-scroll bg-slate-500/50'" class="h-full no-before overflow-y-auto overflow-x-hidden  scroll-smooth hide-scrollbar before:bg-slate-500/50 z-20 rounded-xl">
         <ul ref="ulContainerRef" class="flex flex-col gap-1 p-2">
+          <li v-for="item in temporaryPrizeList" :key="item.id" ref="liRefs">
+            <TemporaryList
+              :temporary-prize="item"
+              :is-current="currentPrize.id === item.id"
+              :edit-temporary-prize="editTemporaryPrize"
+              :delete-temporary-prize="deleteTemporaryPrize"
+            />
+          </li>
           <li
             v-for="item in localPrizeList"
             ref="liRefs" :key="item.id"

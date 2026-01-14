@@ -29,7 +29,7 @@ export function usePrizeList(temporaryPrizeRef: any) {
     function openTemporaryPrizeDialog(item?: IPrizeConfig) {
         if (item) {
             editingTemporaryPrizeId.value = item.id
-            temporaryPrize.value = structuredClone(toRaw(item))
+            prizeConfig.setTemporaryPrize(structuredClone(toRaw(item)))
         }
         else {
             editingTemporaryPrizeId.value = null

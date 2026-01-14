@@ -38,9 +38,9 @@ defineExpose({
     <div class="modal-box max-w-xl border border-fuchsia-400/30 bg-slate-900/80 text-slate-100 shadow-[0_0_40px_rgba(244,114,182,0.25)] backdrop-blur">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-[10px] uppercase tracking-[0.35em] text-fuchsia-200/70">One More Thing</p>
-          <h3 class="text-2xl font-bold bg-gradient-to-r from-amber-200 via-fuchsia-300 to-sky-300 bg-clip-text text-transparent">
-            {{ t('dialog.titleTemporary') }}
+          <p class="text-[10px] uppercase tracking-[0.35em] text-slate-400 mb-1">{{ t('dialog.titleTemporary') }}</p>
+          <h3 class="text-3xl font-bold bg-gradient-to-r from-amber-200 via-fuchsia-300 to-sky-300 bg-clip-text text-transparent">
+            One More Thing
           </h3>
         </div>
         <span class="px-3 py-1 text-xs font-semibold tracking-widest text-fuchsia-100 uppercase border rounded-full border-fuchsia-400/40 bg-fuchsia-500/10">

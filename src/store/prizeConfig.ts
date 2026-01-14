@@ -143,7 +143,7 @@ export const usePrizeConfig = defineStore('prize', {
         resetTemporaryPrize() {
             this.prizeConfig.temporaryPrize = {
                 id: '',
-                name: '',
+                name: 'one more thing',
                 sort: 0,
                 isAll: false,
                 count: 1,

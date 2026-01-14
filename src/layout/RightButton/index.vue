@@ -5,21 +5,30 @@ import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { usePlayMusic } from './usePlayMusic'
+import CustomDialog from '@/components/Dialog/index.vue'
+import useStore from '@/store'
 
 const { playMusic, currentMusic, nextPlay } = usePlayMusic()
 const { isFullscreen, toggle: toggleScreen } = useFullscreen()
 const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
+const personConfig = useStore().personConfig
+const prizeConfig = useStore().prizeConfig
 
 const settingRef = ref()
 const fullScreenRef = ref()
+const resetDialogRef = ref()
 
 function enterConfig() {
     router.push('/log-lottery/config')
 }
 function enterHome() {
     router.push('/log-lottery')
+}
+function resetWinners() {
+    personConfig.resetAlreadyPerson()
+    prizeConfig.resetPrizeUsedCount()
 }
 onMounted(() => {
     settingRef.value.addEventListener('mouseenter', () => {
@@ -71,6 +80,22 @@ onMounted(() => {
         <svg-icon :name="currentMusic.paused ? 'play' : 'pause'" />
       </div>
     </div>
+    <div class="tooltip tooltip-left" :data-tip="t('tooltip.resetWinners')">
+      <div
+        class="flex items-center justify-center w-10 h-10 p-0 m-0 cursor-pointer setting-container bg-slate-500/50 rounded-l-xl hover:bg-slate-500/80 hover:text-fuchsia-400/90"
+        @click="resetDialogRef?.showDialog()"
+      >
+        <svg-icon name="refresh" />
+      </div>
+    </div>
+
+    <!-- 重置中奖名单确认弹窗 -->
+    <CustomDialog
+      ref="resetDialogRef"
+      :title="t('dialog.titleTip')"
+      :desc="t('dialog.dialogResetWinner')"
+      :submit-func="resetWinners"
+    />
   </div>
 </template>
 

@@ -17,6 +17,7 @@ export const tooltipEn = {
     uploadImage: 'Upload Image',
     pleaseGoto: 'Please go to',
     viewWinners: 'View Winners',
+    resetWinners: 'Reset Winners',
 }
 
 export const tooltipZhCn = {
@@ -38,6 +39,7 @@ export const tooltipZhCn = {
     uploadImage: '上传图片',
     pleaseGoto: '请先前往',
     viewWinners: '查看中奖名单',
+    resetWinners: '重置中奖名单',
 }
 
 export const tooltip = {

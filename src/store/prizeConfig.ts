@@ -136,6 +136,17 @@ export const usePrizeConfig = defineStore('prize', {
             }
             this.prizeConfig.temporaryPrizeList = this.prizeConfig.temporaryPrizeList.filter(item => item.id !== prizeItemId)
         },
+        // 重置所有奖项的已抽取数量
+        resetPrizeUsedCount() {
+            this.prizeConfig.prizeList.forEach((prize) => {
+                prize.isUsedCount = 0
+                prize.isUsed = false
+            })
+            this.prizeConfig.temporaryPrizeList.forEach((prize) => {
+                prize.isUsedCount = 0
+                prize.isUsed = false
+            })
+        },
         resetTemporaryPrizeList() {
             this.prizeConfig.temporaryPrizeList = [] as IPrizeConfig[]
         },

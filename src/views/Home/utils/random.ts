@@ -26,10 +26,10 @@ function shuffleBrowserCrypto<T>(array: T[]): T[] {
     // 遍历数组，每轮生成一个随机索引
     for (let i = newArray.length - 1; i > 0; i--) {
         // 步骤1：生成 [0, i] 范围内的均匀随机索引（拒绝采样避免模偏差）
-        const randomIndex = cryptoRandomInt(i + 1)
+        const randomIndex: number = cryptoRandomInt(i + 1);
 
         // 步骤3：交换元素
-        [newArray[i], newArray[randomIndex]] = [newArray[randomIndex], newArray[i]]
+        [newArray[i], newArray[randomIndex]] = [newArray[randomIndex], newArray[i]];
     }
     return newArray
 }

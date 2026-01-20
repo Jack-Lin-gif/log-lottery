@@ -136,3 +136,4 @@ dist-file
 .pnp.*
 target
 .agent/rules/
+.DS_Store
